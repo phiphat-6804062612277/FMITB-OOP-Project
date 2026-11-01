@@ -22,7 +22,11 @@ public class AssetManager {
         this.imageNames = new String[MAX_IMAGES];
         this.images = new Image[MAX_IMAGES];
         this.imageCount = 0;
-        this.assetsDir = new File("assets/images");
+        File dir = new File("assets/images");
+        if (!dir.exists()) {
+            dir = new File("../assets/images");
+        }
+        this.assetsDir = dir;
         preloadAssets();
     }
 

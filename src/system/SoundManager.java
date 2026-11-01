@@ -30,7 +30,11 @@ public class SoundManager {
     private float masterVolume = 0.85f;
 
     private SoundManager() {
-        this.soundsDir = new File("assets/sounds");
+        File dir = new File("assets/sounds");
+        if (!dir.exists()) {
+            dir = new File("../assets/sounds");
+        }
+        this.soundsDir = dir;
         this.clipNames = new String[MAX_SOUNDS];
         this.clips = new Clip[MAX_SOUNDS];
         this.clipCount = 0;
