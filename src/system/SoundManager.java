@@ -110,13 +110,29 @@ public class SoundManager {
     }
 
     private void loadVolumeConfig() {
+        Scanner scanner = null;
         File configFile = new File(soundsDir, "volume_config.txt");
-        if (!configFile.exists()) {
+        if (configFile.exists() && configFile.isFile()) {
+            try {
+                scanner = new Scanner(configFile);
+            } catch (Exception ignored) {
+            }
+        }
+        if (scanner == null) {
+            InputStream is = getClass().getResourceAsStream("/assets/sounds/volume_config.txt");
+            if (is == null) {
+                is = getClass().getResourceAsStream("/sounds/volume_config.txt");
+            }
+            if (is != null) {
+                scanner = new Scanner(is);
+            }
+        }
+
+        if (scanner == null) {
             return;
         }
 
         try {
-            Scanner scanner = new Scanner(configFile);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine().trim();
                 if (line.length() == 0 || line.startsWith("#") || !line.contains("=")) {
@@ -257,6 +273,9 @@ public class SoundManager {
 
         try {
             InputStream is = getClass().getResourceAsStream("/assets/sounds/" + primaryFile);
+            if (is == null) {
+                is = getClass().getResourceAsStream("/sounds/" + primaryFile);
+            }
             if (is != null) {
                 AudioInputStream audioIn = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
                 Clip clip = AudioSystem.getClip();

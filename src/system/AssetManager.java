@@ -96,6 +96,9 @@ public class AssetManager {
             }
         } else {
             URL url = getClass().getResource("/assets/images/" + filename);
+            if (url == null) {
+                url = getClass().getResource("/images/" + filename);
+            }
             if (url != null) {
                 ImageIcon icon = new ImageIcon(url);
                 if (icon.getIconWidth() > 0) {
