@@ -1,0 +1,18 @@
+# Compiled classes
+bin/
+*.class
+
+# Backups and references
+_backup/
+ตัวอย่างproj/
+
+# Gradle build cache
+.gradle/
+build/
+
+# IDE / System files
+.idea/
+.vscode/
+*.iml
+Thumbs.db
+.DS_Store

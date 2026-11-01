@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Class Diagram (Vertical Layout) - Five Minutes In The Bathroom</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.8/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f1f5f9;
+            color: #0f172a;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #1e293b;
+        }
+        p {
+            margin: 6px 0 0 0;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .btn {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(37,99,235,0.25);
+        }
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+        .diagram-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <h1>Class Diagram: Five Minutes In The Bathroom (รูปแบบเรียงแนวดิ่ง A4)</h1>
+        <p>จัดเลย์เอาต์แบบ Top-to-Bottom เรียงลงมายาวๆ เพื่อให้ใส่ลงหน้ากระดาษแนวตั้งของ Word ได้พอดี</p>
+    </div>
+    <button class="btn" onclick="downloadPNG()">💾 ดาวน์โหลดภาพ PNG แนวตั้ง</button>
+</div>
+
+<div class="diagram-container">
+    <pre class="mermaid" id="diagram">
+classDiagram
+    direction TB
+
+    %% ---------------------------------------------------------
+    %% LAYER 1: ENTRY POINT & WINDOWING
+    %% ---------------------------------------------------------
+    class Main {
+        +main(String args) void
+    }
+
+    class GameWindow {
+        -GamePanel gamePanel
+        +GameWindow()
+        +showWindow() void
+    }
+
+    class GamePanel {
+        +int PANEL_WIDTH
+        +int PANEL_HEIGHT
+        +int TARGET_FPS
+        -Thread gameThread
+        -boolean isRunning
+        -GameTimer gameTimer
+        -StaminaManager staminaManager
+        -BathroomManager bathroomManager
+        -CameraManager cameraManager
+        -MonsterAI monsterAI
+        -StateManager stateManager
+        -MenuRenderer menuRenderer
+        -HowToPlayRenderer howToPlayRenderer
+        -BathroomRenderer bathroomRenderer
+        -TabletRenderer tabletRenderer
+        -EndingRenderer gameOverRenderer
+        -EndingRenderer gameWinRenderer
+        +startGameLoop() void
+        +stopGameLoop() void
+        +run() void
+        #paintComponent(Graphics g) void
+        +mousePressed(MouseEvent e) void
+        +keyPressed(KeyEvent e) void
+    }
+
+    Main ..> GameWindow : 1. launches
+    GameWindow *-- GamePanel : 2. embeds
+
+    %% ---------------------------------------------------------
+    %% LAYER 2: STATE MANAGEMENT
+    %% ---------------------------------------------------------
+    class GameState {
+        +int MENU
+        +int HOW_TO_PLAY
+        +int BATHROOM
+        +int TABLET
+        +int GAME_OVER
+        +int GAME_WIN
+    }
+
+    class StateManager {
+        -int currentState
+        -GameTimer timer
+        -StaminaManager stamina
+        -BathroomManager bathroom
+        -CameraManager camera
+        -MonsterAI monsterAI
+        +StateManager(GameTimer timer, StaminaManager stamina, BathroomManager bathroom, CameraManager camera, MonsterAI monsterAI)
+        +startNewGame() void
+        +setState(int newState) void
+        +getCurrentState() int
+        +isPlaying() boolean
+    }
+
+    GamePanel *-- StateManager : 3. controls
+    StateManager ..> GameState : uses constants
+
+    %% ---------------------------------------------------------
+    %% LAYER 3: SUBSYSTEMS & ENTITIES
+    %% ---------------------------------------------------------
+    class GameTimer {
+        -float totalDurationSeconds
+        -float timeRemainingSeconds
+        -boolean isRunning
+        +GameTimer(float durationSeconds)
+        +start() void
+        +stop() void
+        +reset() void
+        +update(float deltaSeconds) void
+        +isTimeUp() boolean
+        +getElapsedTime() float
+        +getProgress() float
+        +getFormattedRemainingTime() String
+    }
+
+    class StaminaManager {
+        +float MAX_STAMINA
+        +float DRAIN_RATE_PER_CLOSURE
+        +float REGEN_RATE
+        +float EXHAUSTION_COOLDOWN
+        -float stamina
+        -boolean isExhausted
+        -float exhaustionTimer
+        +StaminaManager()
+        +reset() void
+        +update(float deltaSeconds, int activeClosures, boolean allowClosure) boolean
+        +canClose() boolean
+        +getStaminaPercentage() float
+        +isExhausted() boolean
+    }
+
+    class BathroomManager {
+        -boolean doorClosed
+        -boolean ventClosed
+        -StaminaManager staminaManager
+        +BathroomManager(StaminaManager staminaManager)
+        +reset() void
+        +update(float deltaSeconds, boolean isTabletOpen) void
+        +toggleDoor() boolean
+        +toggleVent() boolean
+        +isDoorClosed() boolean
+        +isVentClosed() boolean
+        +getStaminaManager() StaminaManager
+    }
+
+    class CameraId {
+        +CameraId C1
+        +CameraId C2
+        +CameraId C3
+        +CameraId C4
+        -String code
+        -int floor
+        +CameraId(String code, int floor)
+        +getCode() String
+        +getFloor() int
+    }
+
+    class CameraManager {
+        -CameraId activeCamera
+        -int activeFloor
+        +CameraManager()
+        +reset() void
+        +selectCamera(CameraId cam) void
+        +toggleFloor() void
+        +setFloor(int floor) void
+        +getActiveCamera() CameraId
+        +getActiveFloor() int
+    }
+
+    class MonsterAI {
+        -MonsterArray monsters
+        -SahurMonster sahur
+        -TralalaMonster tralala
+        +MonsterAI()
+        +reset() void
+        +update(float dt, float gameProgress, BathroomManager bathroom) boolean
+        +getSahur() SahurMonster
+        +getTralala() TralalaMonster
+    }
+
+    class Monster {
+        <<abstract>>
+        #String name
+        #int stage
+        #int maxStage
+        #float moveTimer
+        #float baseMoveInterval
+        #float attackCountdown
+        #float baseAttackReactionTime
+        #float defenseHoldTimer
+        #float requiredHoldTime
+        #boolean isAtAttackPoint
+        #boolean hasKilledPlayer
+        +Monster(String name, int maxStage, float baseMoveInterval, float baseAttackReactionTime, float requiredHoldTime)
+        +reset() void
+        +updateAI(float dt, float gameProgress, BathroomManager bathroom) boolean
+        +onBlocked(BathroomManager bathroom) void
+        +getName() String
+        +getStage() int
+        +isAtAttackPoint() boolean
+    }
+
+    class SahurMonster {
+        +SahurMonster()
+        +updateAI(float dt, float gameProgress, BathroomManager bathroom) boolean
+        +onBlocked(BathroomManager bathroom) void
+    }
+
+    class TralalaMonster {
+        +TralalaMonster()
+        +updateAI(float dt, float gameProgress, BathroomManager bathroom) boolean
+        +onBlocked(BathroomManager bathroom) void
+    }
+
+    class AssetManager {
+        -AssetManager instance
+        -StringArray imageNames
+        -ImageArray images
+        -int imageCount
+        +getInstance() AssetManager
+        +getImage(String filename) Image
+    }
+
+    class SoundManager {
+        -SoundManager instance
+        -StringArray clipNames
+        -ClipArray clips
+        -int clipCount
+        -float masterVolume
+        +getInstance() SoundManager
+        +playSound(String soundName) void
+        +playLoop(String soundName) void
+        +stopSound(String soundName) void
+    }
+
+    StateManager o-- GameTimer
+    StateManager o-- StaminaManager
+    StateManager o-- BathroomManager
+    StateManager o-- CameraManager
+    StateManager o-- MonsterAI
+
+    BathroomManager o-- StaminaManager : controls drain
+    CameraManager o-- CameraId : selects
+    MonsterAI *-- Monster : polymorphically manages
+    SahurMonster --|> Monster : inherits
+    TralalaMonster --|> Monster : inherits
+
+    %% ---------------------------------------------------------
+    %% LAYER 4: PRESENTATION & RENDERERS
+    %% ---------------------------------------------------------
+    class Renderer {
+        <<interface>>
+        +render(Graphics g, int screenWidth, int screenHeight) void
+    }
+
+    class MenuRenderer {
+        +Rectangle START_BTN_BOUNDS
+        +Rectangle HOW_TO_PLAY_BTN_BOUNDS
+        +Rectangle EXIT_BTN_BOUNDS
+        -Point mousePos
+        +setMousePos(Point p) void
+        +render(Graphics g, int width, int height) void
+    }
+
+    class HowToPlayRenderer {
+        +Rectangle BACK_BTN_BOUNDS
+        -Point mousePos
+        +setMousePos(Point p) void
+        +render(Graphics g, int width, int height) void
+    }
+
+    class BathroomRenderer {
+        +Rectangle DOOR_BOUNDS
+        +Rectangle VENT_BOUNDS
+        +Rectangle TABLET_BTN_BOUNDS
+        -BathroomManager bathroom
+        -GameTimer timer
+        -MonsterAI monsterAI
+        +BathroomRenderer(BathroomManager bathroom, GameTimer timer, MonsterAI monsterAI)
+        +render(Graphics g, int width, int height) void
+    }
+
+    class TabletRenderer {
+        +Rectangle CAM_1_BTN
+        +Rectangle CAM_2_BTN
+        +Rectangle CAM_3_BTN
+        +Rectangle CAM_4_BTN
+        +Rectangle FLOOR_TOGGLE_BTN_BOUNDS
+        +Rectangle RETURN_BTN_BOUNDS
+        -CameraManager camera
+        -GameTimer timer
+        -MonsterAI monsterAI
+        +TabletRenderer(CameraManager camera, GameTimer timer, MonsterAI monsterAI)
+        +render(Graphics g, int width, int height) void
+    }
+
+    class EndingRenderer {
+        +Rectangle RETRY_BTN_BOUNDS
+        +Rectangle MENU_BTN_BOUNDS
+        -int state
+        -Point mousePos
+        +EndingRenderer(int state)
+        +setMousePos(Point p) void
+        +render(Graphics g, int width, int height) void
+    }
+
+    GamePanel *-- Renderer : 4. delegates drawing to
+    MenuRenderer ..|> Renderer : implements
+    HowToPlayRenderer ..|> Renderer : implements
+    BathroomRenderer ..|> Renderer : implements
+    TabletRenderer ..|> Renderer : implements
+    EndingRenderer ..|> Renderer : implements
+
+    BathroomRenderer o-- BathroomManager : checks defenses
+    BathroomRenderer o-- MonsterAI : checks attack
+    TabletRenderer o-- CameraManager : views feed
+    MenuRenderer ..> AssetManager : loads bg
+    BathroomRenderer ..> AssetManager : loads sprites
+    TabletRenderer ..> AssetManager : loads cctv
+    EndingRenderer ..> AssetManager : loads end screens
+    </pre>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+
+    function downloadPNG() {
+        const svgElement = document.querySelector('.diagram-container svg');
+        if (!svgElement) {
+            alert('กำลังโหลดไดอะแกรม กรุณารอสักครู่แล้วลองใหม่อีกครั้ง');
+            return;
+        }
+
+        const bbox = svgElement.getBBox();
+        const width = Math.ceil(bbox.width + 40);
+        const height = Math.ceil(bbox.height + 40);
+
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const URL = window.URL || window.webkitURL || window;
+        const blobURL = URL.createObjectURL(svgBlob);
+
+        const img = new Image();
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = width * 2;
+            canvas.height = height * 2;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const pngURL = canvas.toDataURL('image/png');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pngURL;
+            downloadLink.download = 'Class_Diagram_Vertical.png';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        };
+        img.src = blobURL;
+    }
+</script>
+
+</body>
+</html>
